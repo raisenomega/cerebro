@@ -1,10 +1,13 @@
 name: Post-Merge Sentinel
 
-# "POST-PUSH" tras el merge a develop. Hace TRES cosas:
-#   1. Bitácora: registra el merge en docs/merge-log.md (archivo versionado).
-#   2. Notificación al auditor: destino EN BLANCO — enchufar el webhook/secreto.
-#   3. Re-corre el Sentinel sobre develop ya integrado (por si dos cambios
+# "POST-PUSH" tras el merge a develop. Hace DOS cosas:
+#   1. Re-corre el Sentinel sobre develop ya integrado (por si dos cambios
 #      que pasaron por separado se rompen al juntarse).
+#   2. Notificación al auditor: destino EN BLANCO — enchufar el webhook/secreto.
+#
+# La bitácora auto-commiteada a develop se RETIRÓ (Slice 1): el bot empujaba a
+# una rama protegida, lo que choca con la branch protection. El historial de
+# merges queda en el git log y en la página de PRs.
 #
 # Nota de grado bancario: NO despliega nada. El deploy lleva firma humana
 # (Constitución §3). Si algún día se agrega deploy aquí, va detrás de un
@@ -16,10 +19,10 @@ on:
       - develop
 
 permissions:
-  contents: write   # para escribir la bitácora
+  contents: read
 
 jobs:
-  # --- 3) Re-corrida del Sentinel sobre develop integrado ---
+  # --- 1) Re-corrida del Sentinel sobre develop integrado ---
   revalidate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -36,25 +39,6 @@ jobs:
         run: chmod +x scripts/sentinel.sh scripts/sentinel/*.sh
       - name: Re-run sentinel on integrated develop
         run: bash scripts/sentinel.sh
-
-  # --- 1) Bitácora de merges (archivo versionado en el repo) ---
-  bitacora:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: Append merge to bitácora
-        run: |
-          mkdir -p docs
-          LINE="$(date -Iseconds) · ${GITHUB_SHA::7} · $(git log -1 --format='%an' ) · $(git log -1 --format='%s')"
-          echo "- ${LINE}" >> docs/merge-log.md
-      - name: Commit bitácora
-        run: |
-          git config user.name  "sentinel-bot"
-          git config user.email "sentinel-bot@users.noreply.github.com"
-          git add docs/merge-log.md
-          git commit -m "chore(sentinel): bitácora de merge ${GITHUB_SHA::7} [skip ci]" || echo "sin cambios"
-          git push || echo "push de bitácora falló (no bloqueante)"
 
   # --- 2) Notificación al auditor (DESTINO EN BLANCO) ---
   notify-auditor:

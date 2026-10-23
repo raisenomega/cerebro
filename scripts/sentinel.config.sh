@@ -14,13 +14,13 @@ export SENTINEL_BASE_BRANCH="origin/develop"
 # CEREBRO arranca en Slice 0 (solo el paquete de contratos TS). Empieza con
 # typecheck + lint; activar el resto conforme se construyan los scripts.
 export SENTINEL_GATES=(
-  "typecheck|pnpm run typecheck"           # corre pnpm -r typecheck (todos los paquetes, strict)
-  "lint|pnpm run lint"                     # placeholder hasta Slice 1 (exit 0)
+  "typecheck|pnpm run typecheck"           # build + pnpm -r typecheck (todos los paquetes, strict)
+  "lint|pnpm run lint"                     # placeholder (ESLint queda como deuda, ver current-state)
+  "test:unit|pnpm run test:unit"           # Slice 1: unit tests del resolver (vitest, sin DB)
   # "check:lines|pnpm run check:lines"       # cuando exista scripts/check-lines.sh
   # "check:layers|pnpm run check:layers"     # cuando exista scripts/check-layers.sh
-  # "test:unit|pnpm run test:unit"           # cuando haya tests
   # "test:integration|pnpm exec vitest run tests/integration/"
-  # "adversarial|bash scripts/test-gates.sh" # tests adversariales de RLS por tenant
+  # "adversarial|bash scripts/test-rls.sh"   # RLS por plataforma — requiere Postgres (DATABASE_URL)
 )
 
 # --- Bloque B: confidencialidad ---

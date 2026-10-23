@@ -10,8 +10,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm -r build && pnpm -r typecheck",
     "build": "pnpm -r build",
+    "test:unit": "pnpm -r --if-present test:unit",
     "lint": "echo \"(lint pendiente de configurar — Slice 1)\" && exit 0",
     "prepare": "husky || true"
   },

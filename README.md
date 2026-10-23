@@ -10,11 +10,15 @@ Capa de memoria/cognición **compartida** del ecosistema RAISEN.dev. No es un pr
 - Guarda solo lo compartido/derivado (identidad, RAG, grafo, aprendizaje). Nunca la verdad operacional de otra plataforma.
 - **Regla de oro:** CEREBRO enriquece, no bloquea. Si cae, cada plataforma sigue con su data local.
 
-## Eststructura
+## Estructura
 
 ```
 packages/
   cerebro-contracts/   # @raisen/cerebro-contracts — Slice 0: contratos compartidos
+apps/
+  cerebro/             # @raisen/cerebro — servicio (Slice 1: dominio de identidad)
+supabase/migrations/   # migraciones SQL (001: identidad + plataformas)
+rollback/              # .down.sql por migración
 scripts/sentinel/      # gate pre-push grado bancario
 docs-hub/              # documentos internos (gitignored)
 ```
@@ -35,6 +39,13 @@ pnpm -r build        # compila los paquetes
 pnpm -r typecheck    # typecheck estricto
 ```
 
-## Siguiente: Slice 1
+## Slice 1 — Identidad + registro de plataformas (en PR)
 
-Identidad + registro de plataformas: Supabase, migración `001` (`platform`, `person`, `person_identity`, RLS) y el resolver determinístico. Ver `docs-hub/CEREBRO_v1_Agent_Brief.md`.
+Supabase propio, migración `001` (`platform`, `person`, `person_identity`, RLS, índice de lookup) con su rollback, y el **resolver determinístico** (`apps/cerebro`, DDD por capas) que unifica a un `person_id` estable. Ver `docs-hub/CEREBRO_v1_Agent_Brief.md`.
+
+```bash
+pnpm install
+pnpm -r build && pnpm -r typecheck
+pnpm -r --if-present test:unit            # tests del resolver (sin DB)
+DATABASE_URL=... bash scripts/test-rls.sh # test adversarial de RLS (requiere Postgres con 001 aplicada)
+```
