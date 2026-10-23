@@ -1,64 +1,86 @@
 -- =====================================================================
--- Test adversarial de RLS — person_identity (Slice 1 · criterio §4 del brief)
+-- Test adversarial de RLS — identidad por owner (Slice 1 · §6 de la Decisión)
 -- =====================================================================
--- Verifica la propiedad de grado bancario: un "tenant" (plataforma) NO puede
--- leer person_identity de otro.
+-- Verifica las tres propiedades de grado bancario:
+--   (a) AISLAMIENTO:   owner A no lee person_identity de owner B (RLS).
+--   (b) NO CRUCE:      el mismo email bajo owner A y owner B => person_id DISTINTOS.
+--   (c) EL "AJÁ":      el mismo email (nucleo y hub) del MISMO owner => MISMA person
+--                      (lo garantiza el UNIQUE (owner_id, id_type, id_normalized)).
 --
 -- Requiere un Postgres con la migración 001 aplicada. Correr con:
 --   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rls_person_identity.sql
 --   (o: bash scripts/test-rls.sh)
---
 -- Pasa => imprime 'RLS OK …' y sale 0. Falla => RAISE EXCEPTION y aborta ≠0.
--- No deja residuo: todo corre en una transacción que termina en ROLLBACK.
+-- Corre como el ROL REAL de la app (cerebro_api, SIN BYPASSRLS). No deja residuo
+-- (todo dentro de una transacción que termina en ROLLBACK).
 -- =====================================================================
 \set ON_ERROR_STOP on
 
 BEGIN;
 
--- Rol de prueba SUJETO a RLS (sin BYPASSRLS), aislado del service_role.
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'cerebro_rls_test') THEN
-    CREATE ROLE cerebro_rls_test NOLOGIN;
-  END IF;
-END $$;
-GRANT USAGE ON SCHEMA public TO cerebro_rls_test;
-GRANT SELECT ON platform, person, person_identity TO cerebro_rls_test;
-GRANT EXECUTE ON FUNCTION cerebro_current_platform() TO cerebro_rls_test;
+-- --- Seed de prueba (como superusuario/owner de las tablas: bypass RLS) ------
+-- Dos negocios A y B; el negocio A tiene tenants en nucleo y hub.
+INSERT INTO owner (id, name) VALUES
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'RLS test · owner A'),
+  ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'RLS test · owner B');
 
--- Seed de prueba como owner/service (bypass RLS): una identidad por plataforma.
--- Las plataformas nucleo/hub ya existen por el seed de 001.
-WITH p_n AS (INSERT INTO person (display_name) VALUES ('RLS test · nucleo') RETURNING id),
-     p_h AS (INSERT INTO person (display_name) VALUES ('RLS test · hub')    RETURNING id)
-INSERT INTO person_identity (person_id, source_platform, id_type, id_value, id_normalized)
-SELECT id, 'nucleo', 'email', 'rls-n@test.local', 'rls-n@test.local' FROM p_n
-UNION ALL
-SELECT id, 'hub',    'email', 'rls-h@test.local', 'rls-h@test.local' FROM p_h;
+INSERT INTO owner_platform_tenant (owner_id, source_platform, platform_tenant_id) VALUES
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'nucleo', 'rls-A-nucleo'),
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'hub',    'rls-A-hub'),
+  ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'nucleo', 'rls-B-nucleo');
 
--- --- Adversarial: actuar como la plataforma 'hub' e intentar leer 'nucleo' ---
-SET LOCAL cerebro.platform = 'hub';
-SET LOCAL ROLE cerebro_rls_test;
+-- Persona + identidad (mismo email 'e@test') en cada owner.
+INSERT INTO person (id, owner_id, display_name) VALUES
+  ('a0000000-0000-4000-8000-00000000000a', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A·persona'),
+  ('b0000000-0000-4000-8000-00000000000b', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'B·persona'),
+  -- segunda persona de A, para el intento adversarial del caso (c)
+  ('a0000000-0000-4000-8000-00000000000c', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A·persona 2');
+
+INSERT INTO person_identity (owner_id, person_id, source_platform, id_type, id_value, id_normalized) VALUES
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'a0000000-0000-4000-8000-00000000000a', 'nucleo', 'email', 'e@test', 'e@test'),
+  ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'b0000000-0000-4000-8000-00000000000b', 'nucleo', 'email', 'e@test', 'e@test');
+
+-- --- A partir de aquí, el ROL REAL de la app (sujeto a RLS) ------------------
+SET LOCAL ROLE cerebro_api;
+SET LOCAL app.current_owner_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';  -- contexto = owner A
 
 DO $$
 DECLARE
-  leak_count int;
-  own_count  int;
+  leak_count   int;
+  own_count    int;
+  seen_person  uuid;
 BEGIN
-  -- NO debe ver NINGUNA fila de otra plataforma (nucleo).
+  -- (a) AISLAMIENTO: owner A NO ve nada de owner B.
   SELECT count(*) INTO leak_count
-  FROM person_identity WHERE source_platform = 'nucleo';
+  FROM person_identity WHERE owner_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   IF leak_count <> 0 THEN
-    RAISE EXCEPTION 'RLS FALLÓ: hub leyó % fila(s) de person_identity de nucleo (debe ser 0)', leak_count;
+    RAISE EXCEPTION 'RLS FALLÓ (a): owner A leyó % fila(s) de owner B (debe ser 0)', leak_count;
   END IF;
 
-  -- SÍ debe ver sus propias filas (hub).
-  SELECT count(*) INTO own_count
-  FROM person_identity WHERE source_platform = 'hub';
+  SELECT count(*) INTO own_count FROM person_identity;  -- RLS ya acota a A
   IF own_count < 1 THEN
-    RAISE EXCEPTION 'RLS FALLÓ: hub no puede leer sus propias filas de person_identity (vio %)', own_count;
+    RAISE EXCEPTION 'RLS FALLÓ (a): owner A no ve sus propias filas (vio %)', own_count;
   END IF;
 
-  RAISE NOTICE 'RLS OK · hub no ve nucleo (leak=%) y sí ve lo suyo (own=%)', leak_count, own_count;
+  -- (b) NO CRUCE: bajo A, 'e@test' resuelve a la persona de A (no la de B).
+  SELECT person_id INTO seen_person
+  FROM person_identity WHERE id_type = 'email' AND id_normalized = 'e@test';
+  IF seen_person <> 'a0000000-0000-4000-8000-00000000000a' THEN
+    RAISE EXCEPTION 'RLS FALLÓ (b): bajo owner A, e@test resolvió a % (esperado la persona de A)', seen_person;
+  END IF;
+
+  -- (c) EL "AJÁ"/UNIQUE: un segundo evento (hub) del MISMO owner y email NO puede
+  -- crear otra identidad -> el resolver cae en la existente (misma person).
+  BEGIN
+    INSERT INTO person_identity (owner_id, person_id, source_platform, id_type, id_value, id_normalized)
+    VALUES ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'a0000000-0000-4000-8000-00000000000c', 'hub', 'email', 'e@test', 'e@test');
+    RAISE EXCEPTION 'RLS/UNIQUE FALLÓ (c): se permitió una 2a identidad para (owner A, email, e@test)';
+  EXCEPTION
+    WHEN unique_violation THEN
+      NULL;  -- esperado: la unicidad por (owner_id, id_type, id_normalized) fuerza una sola persona
+  END;
+
+  RAISE NOTICE 'RLS OK · (a) aislamiento leak=% own=% · (b) e@test->A · (c) unique fuerza unificación', leak_count, own_count;
 END $$;
 
 RESET ROLE;

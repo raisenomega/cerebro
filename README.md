@@ -41,7 +41,7 @@ pnpm -r typecheck    # typecheck estricto
 
 ## Slice 1 — Identidad + registro de plataformas (en PR)
 
-Supabase propio, migración `001` (`platform`, `person`, `person_identity`, RLS, índice de lookup) con su rollback, y el **resolver determinístico** (`apps/cerebro`, DDD por capas) que unifica a un `person_id` estable. Ver `docs-hub/CEREBRO_v1_Agent_Brief.md`.
+Identidad aislada por **negocio (owner)** con **RLS en la base** (fail-closed, sin BYPASSRLS). Migración `001` (`platform`, `owner`, `owner_platform_tenant`, `person`, `person_identity`) con su rollback, y el **resolver determinístico** (`apps/cerebro`, DDD por capas): traduce `(plataforma, tenant) → owner`, fija el contexto RLS y unifica a un `person_id` estable dentro del owner. Ver `docs-hub/CEREBRO_v1_Agent_Brief.md`.
 
 ```bash
 pnpm install

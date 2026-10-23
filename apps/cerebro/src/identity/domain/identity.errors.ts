@@ -13,6 +13,9 @@ export type NormalizeError =
 export type ResolveError =
   | NormalizeError
   | { readonly kind: "missing_source_platform" }
+  | { readonly kind: "missing_tenant_id" }
+  // fail-closed: el tenant no está mapeado a ningún owner.
+  | { readonly kind: "unknown_tenant"; readonly source_platform: string; readonly tenant_id: string }
   | { readonly kind: "repository_error"; readonly detail: string };
 
 export type MergeError =
