@@ -20,3 +20,6 @@ docs-hub/
 # Sistema
 .DS_Store
 *.log
+
+# Estado local del CLI de Supabase (link)
+supabase/.temp/

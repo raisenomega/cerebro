@@ -41,6 +41,10 @@ INSERT INTO person_identity (owner_id, person_id, source_platform, id_type, id_v
   ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'b0000000-0000-4000-8000-00000000000b', 'nucleo', 'email', 'e@test', 'e@test');
 
 -- --- A partir de aquí, el ROL REAL de la app (sujeto a RLS) ------------------
+-- Habilita SET ROLE hacia cerebro_api desde el rol creador: en PG16+ el
+-- auto-grant del creador trae SET=false, pero un GRANT explícito habilita SET.
+-- Se revierte con el ROLLBACK final (no deja membresía permanente).
+GRANT cerebro_api TO current_user;
 SET LOCAL ROLE cerebro_api;
 SET LOCAL app.current_owner_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';  -- contexto = owner A
 
