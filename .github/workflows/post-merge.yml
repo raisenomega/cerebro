@@ -1,0 +1,85 @@
+name: Post-Merge Sentinel
+
+# "POST-PUSH" tras el merge a develop. Hace TRES cosas:
+#   1. Bitácora: registra el merge en docs/merge-log.md (archivo versionado).
+#   2. Notificación al auditor: destino EN BLANCO — enchufar el webhook/secreto.
+#   3. Re-corre el Sentinel sobre develop ya integrado (por si dos cambios
+#      que pasaron por separado se rompen al juntarse).
+#
+# Nota de grado bancario: NO despliega nada. El deploy lleva firma humana
+# (Constitución §3). Si algún día se agrega deploy aquí, va detrás de un
+# environment con "required reviewers", nunca automático.
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write   # para escribir la bitácora
+
+jobs:
+  # --- 3) Re-corrida del Sentinel sobre develop integrado ---
+  revalidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'pnpm' }
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Make sentinel scripts executable
+        run: chmod +x scripts/sentinel.sh scripts/sentinel/*.sh
+      - name: Re-run sentinel on integrated develop
+        run: bash scripts/sentinel.sh
+
+  # --- 1) Bitácora de merges (archivo versionado en el repo) ---
+  bitacora:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Append merge to bitácora
+        run: |
+          mkdir -p docs
+          LINE="$(date -Iseconds) · ${GITHUB_SHA::7} · $(git log -1 --format='%an' ) · $(git log -1 --format='%s')"
+          echo "- ${LINE}" >> docs/merge-log.md
+      - name: Commit bitácora
+        run: |
+          git config user.name  "sentinel-bot"
+          git config user.email "sentinel-bot@users.noreply.github.com"
+          git add docs/merge-log.md
+          git commit -m "chore(sentinel): bitácora de merge ${GITHUB_SHA::7} [skip ci]" || echo "sin cambios"
+          git push || echo "push de bitácora falló (no bloqueante)"
+
+  # --- 2) Notificación al auditor (DESTINO EN BLANCO) ---
+  notify-auditor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify (placeholder — enchufar webhook)
+        run: |
+          echo "═══════════════════════════════════════════════"
+          echo " MERGE A DEVELOP — aviso al auditor"
+          echo "   repo:   ${GITHUB_REPOSITORY}"
+          echo "   commit: ${GITHUB_SHA::7}"
+          echo "   actor:  ${GITHUB_ACTOR}"
+          echo "═══════════════════════════════════════════════"
+          echo ""
+          echo "TODO(owner): enchufar el canal de notificación."
+          echo "  - Crear un secret del repo (ej. AUDITOR_WEBHOOK_URL)."
+          echo "  - Descomentar el paso 'Send webhook' de abajo."
+          echo "  - Hoy esto solo imprime en el log de Actions (no sale a ningún lado)."
+
+      # Descomentar y configurar el secret AUDITOR_WEBHOOK_URL para activar:
+      # - name: Send webhook
+      #   env:
+      #     WEBHOOK: ${{ secrets.AUDITOR_WEBHOOK_URL }}
+      #   run: |
+      #     [ -z "$WEBHOOK" ] && { echo "sin webhook configurado"; exit 0; }
+      #     curl -sS -X POST "$WEBHOOK" \
+      #       -H 'Content-Type: application/json' \
+      #       -d "{\"text\":\"Merge a develop en ${GITHUB_REPOSITORY} · ${GITHUB_SHA::7} · por ${GITHUB_ACTOR}\"}"

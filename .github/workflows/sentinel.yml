@@ -1,0 +1,51 @@
+name: Sentinel
+
+# CAPA 2 (post-push en la nube): corre el mismo Sentinel que el hook local,
+# en cada push a ramas de trabajo y en cada PR a develop/main.
+# La branch protection impide el merge si este check no está verde.
+
+on:
+  push:
+    branches:
+      - 'hotfix/**'
+      - 'feature/**'
+      - 'develop'
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Make sentinel scripts executable
+        run: chmod +x scripts/sentinel.sh scripts/sentinel/*.sh
+
+      - name: Run sentinel
+        run: bash scripts/sentinel.sh
+
+      - name: Upload sentinel report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-report-${{ github.sha }}
+          path: .sentinel-reports/
+          retention-days: 30

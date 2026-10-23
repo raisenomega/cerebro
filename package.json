@@ -1,0 +1,22 @@
+{
+  "name": "cerebro",
+  "version": "0.1.0",
+  "description": "CEREBRO by raisen.dev — capa de memoria/cognición compartida del ecosistema RAISEN.dev.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "build": "pnpm -r build",
+    "lint": "echo \"(lint pendiente de configurar — Slice 1)\" && exit 0",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "typescript": "^5.6.0"
+  }
+}

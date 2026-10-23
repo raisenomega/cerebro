@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Confidencial — documentos internos (NUNCA se commitean)
+docs-hub/
+
+# Reportes del Sentinel (locales)
+.sentinel-reports/
+
+# Entorno / secretos
+.env
+.env.*
+!.env.example
+
+# Sistema
+.DS_Store
+*.log
