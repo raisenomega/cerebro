@@ -3,6 +3,6 @@
 # Si falla, el push se aborta.
 # --no-verify salta SOLO este hook local; el CI en GitHub corre lo mismo
 # y la rama no mergea sin que pase (branch protection).
-set -euo pipefail
+set -eu
 
 bash scripts/sentinel.sh
