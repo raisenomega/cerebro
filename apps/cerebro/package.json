@@ -1,7 +1,7 @@
 {
   "name": "@raisen/cerebro",
   "version": "0.1.0",
-  "description": "CEREBRO — servicio de cognición compartida. Slice 1: identidad + registro de plataformas.",
+  "description": "CEREBRO — servicio de cognición compartida. Slices 1-2: identidad + RAG (ingesta/retrieve).",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -11,6 +11,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "vitest run",
+    "start": "node dist/http/main.js",
     "clean": "rm -rf dist"
   },
   "engines": {

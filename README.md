@@ -16,8 +16,8 @@ Capa de memoria/cognición **compartida** del ecosistema RAISEN.dev. No es un pr
 packages/
   cerebro-contracts/   # @raisen/cerebro-contracts — Slice 0: contratos compartidos
 apps/
-  cerebro/             # @raisen/cerebro — servicio (Slice 1: dominio de identidad)
-supabase/migrations/   # migraciones SQL (001: identidad + plataformas)
+  cerebro/             # @raisen/cerebro — servicio (identity/ + rag/ + http/)
+supabase/migrations/   # migraciones SQL (001 identidad, 002 knowledge_chunk)
 rollback/              # .down.sql por migración
 scripts/sentinel/      # gate pre-push grado bancario
 docs-hub/              # documentos internos (gitignored)
@@ -48,4 +48,16 @@ pnpm install
 pnpm -r build && pnpm -r typecheck
 pnpm -r --if-present test:unit            # tests del resolver (sin DB)
 DATABASE_URL=... bash scripts/test-rls.sh # test adversarial de RLS (requiere Postgres con 001 aplicada)
+```
+
+## Slice 2 — Ingesta + RAG + retrieve con scope (en PR)
+
+API de CEREBRO para que las plataformas alimenten y consulten la memoria:
+- Migración `002` (`knowledge_chunk`, `vector(1024)` Voyage, `visibility`, RLS por owner, índice ivfflat cosine; UNIQUE `(owner_id, dedup_key)` para idempotencia).
+- `POST /cerebro/ingest` (202, fire-and-forget, idempotente) → resuelve persona, embebe y guarda un chunk.
+- `POST /cerebro/retrieve` (200) → embebe la query, busca por similitud dentro del owner y la persona, **filtra por el scope de visibilidad del agente**. Nunca bloquea: ante fallo degrada a vacío.
+- Embedding en CEREBRO (Voyage `voyage-3-large`/1024), key solo en Vault. Auth por service token (`Authorization: Bearer <token>`).
+
+```bash
+pnpm --filter @raisen/cerebro start   # levanta la API (requiere DATABASE_URL, VOYAGE_API_KEY, CEREBRO_SERVICE_TOKEN_*)
 ```
