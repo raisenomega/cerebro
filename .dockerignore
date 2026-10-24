@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.github
+docs-hub
+.sentinel-reports
+**/*.log
+.env
+.env.*
+!.env.example

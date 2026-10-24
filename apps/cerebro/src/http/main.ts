@@ -3,7 +3,6 @@
  * rol cerebro_api vía DATABASE_URL, Voyage, auth por env) y levanta el servidor.
  * Ejecutar: `node dist/http/main.js` (en Railway). No se importa en tests.
  */
-import { pathToFileURL } from "node:url";
 import { Pool } from "pg";
 import { PgIdentityUnitOfWork, PgOwnerResolver } from "../identity/infrastructure/pg-identity.repository.js";
 import { PgKnowledgeUnitOfWork } from "../rag/infrastructure/pg-knowledge-store.js";
@@ -44,7 +43,5 @@ function requireEnv(name: string): string {
   return value;
 }
 
-const entry = process.argv[1];
-if (entry !== undefined && import.meta.url === pathToFileURL(entry).href) {
-  main();
-}
+// Este módulo es el entrypoint (node dist/http/main.js); nada lo importa.
+main();
