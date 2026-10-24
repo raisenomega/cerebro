@@ -3,7 +3,7 @@
  * un token por plataforma. Mapea token -> source_platform desde las env
  * CEREBRO_SERVICE_TOKEN_<PLATAFORMA> (en el Vault). Devuelve null si no matchea.
  */
-import type { SourcePlatform } from "@raisen/cerebro-contracts";
+import type { SourcePlatform } from "@raisenomega/cerebro-contracts";
 
 export type TokenPlatformResolver = (token: string) => SourcePlatform | null;
 

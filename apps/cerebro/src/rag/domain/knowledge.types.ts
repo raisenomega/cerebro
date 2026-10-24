@@ -1,7 +1,7 @@
 /**
  * Tipos del dominio RAG (knowledge_chunk). Scoped por owner (modelo del Slice 1).
  */
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { OwnerId } from "../../identity/domain/person.types.js";
 
 export interface NewChunk {

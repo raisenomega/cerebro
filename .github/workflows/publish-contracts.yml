@@ -1,0 +1,46 @@
+name: Publish contracts
+
+# Publica @raisenomega/cerebro-contracts a GitHub Packages al crear un tag
+# `contracts-v*` (p.ej. contracts-v0.1.0). Usa el GITHUB_TOKEN del repo
+# (packages: write) — sin PAT manual.
+
+on:
+  push:
+    tags:
+      - "contracts-v*"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build contracts
+        run: pnpm --filter @raisenomega/cerebro-contracts build
+
+      - name: Configure GitHub Packages auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo "@raisenomega:registry=https://npm.pkg.github.com"
+            echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"
+          } > .npmrc
+
+      - name: Publish to GitHub Packages
+        run: pnpm --filter @raisenomega/cerebro-contracts publish --no-git-checks

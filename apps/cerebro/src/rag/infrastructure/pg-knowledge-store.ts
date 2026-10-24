@@ -5,7 +5,7 @@
  * ÚNICO lugar RAG que toca `pg`.
  */
 import { type Pool, type PoolClient } from "pg";
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { OwnerId } from "../../identity/domain/person.types.js";
 import type {
   KnowledgeStore,

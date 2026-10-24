@@ -4,7 +4,7 @@
  * Verifica los tres criterios del Slice 3 (el "ajá", scope financial, fail-closed).
  */
 import { describe, it, expect } from "vitest";
-import type { RetrieveRequest } from "@raisen/cerebro-contracts";
+import type { RetrieveRequest } from "@raisenomega/cerebro-contracts";
 import { buildNucleoSeedEvents } from "./nucleo-seed.js";
 import { ingestEvent, type IngestDeps } from "../rag/application/ingest-event.handler.js";
 import { retrieveContext, type RetrieveDeps } from "../rag/application/retrieve-context.handler.js";

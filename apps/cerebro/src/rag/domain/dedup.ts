@@ -4,7 +4,7 @@
  * Hash estable (claves ordenadas) para que el orden de serialización no influya.
  */
 import { createHash } from "node:crypto";
-import type { CerebroEvent } from "@raisen/cerebro-contracts";
+import type { CerebroEvent } from "@raisenomega/cerebro-contracts";
 
 export function computeDedupKey(event: CerebroEvent): string {
   const canonical = stableStringify({

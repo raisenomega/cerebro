@@ -11,7 +11,7 @@
  * El aislamiento vive en la BASE (RLS), no aquí: el resolver NO corre con
  * BYPASSRLS. Nunca lanza: Result<ResolveOutcome, ResolveError>. confidence = 1.0.
  */
-import type { IdentityRef, PersonId } from "@raisen/cerebro-contracts";
+import type { IdentityRef, PersonId } from "@raisenomega/cerebro-contracts";
 import { type Result, ok, err, isErr } from "../../shared/result.js";
 import type { ResolveError } from "../domain/identity.errors.js";
 import type { OwnerId, ResolveOutcome, ResolveStatus } from "../domain/person.types.js";

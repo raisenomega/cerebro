@@ -4,7 +4,7 @@
  * y los adaptadores comparten. `owner` es interno de CEREBRO (no viaja en los
  * contratos de Slice 0).
  */
-import type { IdType, PersonId } from "@raisen/cerebro-contracts";
+import type { IdType, PersonId } from "@raisenomega/cerebro-contracts";
 
 /** UUID del negocio a nivel CEREBRO. El aislamiento de identidad es por owner. */
 export type OwnerId = string;

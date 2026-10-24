@@ -2,7 +2,7 @@
  * Puertos de persistencia RAG. Operan DENTRO de un contexto de owner (RLS
  * activa). Dos adaptadores: Postgres/pgvector (prod) e in-memory (tests).
  */
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { OwnerId } from "../../identity/domain/person.types.js";
 import type { NewChunk, ScoredChunk, StoredChunkRef } from "./knowledge.types.js";
 

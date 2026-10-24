@@ -6,7 +6,7 @@
  * Idempotente: el mismo evento dos veces NO duplica (dedup_key) y NO re-embebe.
  * (Grafo y agent_memory son fases posteriores.)
  */
-import type { CerebroEvent, IngestAck } from "@raisen/cerebro-contracts";
+import type { CerebroEvent, IngestAck } from "@raisenomega/cerebro-contracts";
 import { type Result, ok, err, isErr } from "../../shared/result.js";
 import type { ResolveError } from "../../identity/domain/identity.errors.js";
 import { resolvePerson, type ResolveDeps } from "../../identity/application/resolve-person.handler.js";

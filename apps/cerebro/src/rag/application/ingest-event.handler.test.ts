@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { CerebroEvent } from "@raisen/cerebro-contracts";
+import type { CerebroEvent } from "@raisenomega/cerebro-contracts";
 import { ingestEvent, type IngestDeps } from "./ingest-event.handler.js";
 import {
   InMemoryOwnerResolver,

@@ -2,7 +2,7 @@
  * Puerto del scope de visibilidad por agente (tabla `agent_scope`, §3 del doc de
  * alineación). Config global del ecosistema (no owner-scoped).
  */
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 
 export interface ScopeStore {
   /**

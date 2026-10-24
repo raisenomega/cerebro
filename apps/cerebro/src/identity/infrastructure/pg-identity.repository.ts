@@ -8,7 +8,7 @@
  * `*Row` explícitas (sin filtrar tipos laxos de la DB al resto del código).
  */
 import { type Pool, type PoolClient } from "pg";
-import type { IdType, PersonId } from "@raisen/cerebro-contracts";
+import type { IdType, PersonId } from "@raisenomega/cerebro-contracts";
 import type {
   IdentityLookup,
   IdentityStore,

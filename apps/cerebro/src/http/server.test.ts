@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import type { CerebroEvent, RetrieveRequest } from "@raisen/cerebro-contracts";
+import type { CerebroEvent, RetrieveRequest } from "@raisenomega/cerebro-contracts";
 import { createCerebroServer } from "./server.js";
 import {
   InMemoryOwnerResolver,

@@ -18,7 +18,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@raisen/cerebro-contracts": "workspace:*",
+    "@raisenomega/cerebro-contracts": "workspace:*",
     "pg": "^8.23.1"
   },
   "devDependencies": {

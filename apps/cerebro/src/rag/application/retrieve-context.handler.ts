@@ -7,7 +7,7 @@
  * NUNCA lanza: ante cualquier fallo (tenant desconocido, Voyage caído, DB) o
  * sin persona, devuelve una respuesta vacía (`degraded` si fue por fallo).
  */
-import type { RetrieveRequest, RetrieveResponse } from "@raisen/cerebro-contracts";
+import type { RetrieveRequest, RetrieveResponse } from "@raisenomega/cerebro-contracts";
 import type {
   IdentityUnitOfWork,
   OwnerResolver,
