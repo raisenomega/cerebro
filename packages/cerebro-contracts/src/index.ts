@@ -1,5 +1,5 @@
 /**
- * @raisen/cerebro-contracts
+ * @raisenomega/cerebro-contracts
  * --------------------------
  * Contratos compartidos del ecosistema RAISEN.dev para hablar con CEREBRO.
  * Lo importan TANTO CEREBRO (al implementar la API) COMO cada plataforma

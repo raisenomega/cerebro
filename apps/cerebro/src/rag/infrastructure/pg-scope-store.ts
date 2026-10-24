@@ -3,7 +3,7 @@
  * así que consulta directa por el pool. Sin filas -> [] (fail-closed).
  */
 import { type Pool } from "pg";
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { ScopeStore } from "../domain/scope-store.port.js";
 
 interface VisibilityRow {

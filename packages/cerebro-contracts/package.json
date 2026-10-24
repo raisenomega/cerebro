@@ -1,9 +1,8 @@
 {
-  "name": "@raisen/cerebro-contracts",
+  "name": "@raisenomega/cerebro-contracts",
   "version": "0.1.0",
   "description": "Contratos compartidos del ecosistema RAISEN.dev para hablar con CEREBRO (identidad, eventos, retrieve, puerto del cliente). Slice 0.",
   "license": "UNLICENSED",
-  "private": true,
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -16,6 +15,14 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raisenomega/cerebro.git",
+    "directory": "packages/cerebro-contracts"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

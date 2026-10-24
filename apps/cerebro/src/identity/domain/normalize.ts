@@ -8,7 +8,7 @@
  * `id_normalized` es la forma canónica del match determinístico (confidence 1.0).
  * El fuzzy vendrá después, con confidence < 1.0 + revisión.
  */
-import type { IdType } from "@raisen/cerebro-contracts";
+import type { IdType } from "@raisenomega/cerebro-contracts";
 import { type Result, ok, err } from "../../shared/result.js";
 import type { NormalizeError } from "./identity.errors.js";
 

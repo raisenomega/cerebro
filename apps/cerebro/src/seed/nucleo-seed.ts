@@ -6,7 +6,7 @@
  * Identidad = email, la clave real de NÚCLEO: (tenant_id, lower(trim(email))).
  * NÚCLEO no tiene outbox: el v1 usa este seed para alimentar CEREBRO.
  */
-import type { CerebroEvent, IdentityRef } from "@raisen/cerebro-contracts";
+import type { CerebroEvent, IdentityRef } from "@raisenomega/cerebro-contracts";
 
 const NUCLEO = "nucleo";
 

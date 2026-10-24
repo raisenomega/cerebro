@@ -2,7 +2,7 @@
  * ScopeStore en memoria (tests/dev) + la semilla canónica del scope por agente.
  * SCOPE_SEED DEBE coincidir con el seed de la migración 003 (agent_scope).
  */
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { ScopeStore } from "../domain/scope-store.port.js";
 
 export const SCOPE_SEED: Readonly<Record<string, readonly Visibility[]>> = {

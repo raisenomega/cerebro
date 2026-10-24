@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { IdentityRef } from "@raisen/cerebro-contracts";
+import type { IdentityRef } from "@raisenomega/cerebro-contracts";
 import { resolvePerson, type ResolveDeps } from "./resolve-person.handler.js";
 import { mergePersons } from "./merge-persons.handler.js";
 import {

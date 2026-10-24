@@ -2,7 +2,7 @@
  * Derivación del texto embebible y la visibilidad de un evento (v1).
  * CEREBRO guarda derivado, nunca la verdad operacional cruda.
  */
-import type { CerebroEvent, Visibility } from "@raisen/cerebro-contracts";
+import type { CerebroEvent, Visibility } from "@raisenomega/cerebro-contracts";
 
 export function buildContent(event: CerebroEvent): string {
   return `[${event.event}] ${safeStringify(event.payload)}`.trim();

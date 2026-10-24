@@ -8,7 +8,7 @@
  * ante cualquier fallo). Auth por Bearer service token.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import type { CerebroEvent, RetrieveRequest } from "@raisen/cerebro-contracts";
+import type { CerebroEvent, RetrieveRequest } from "@raisenomega/cerebro-contracts";
 import { ingestEvent, type IngestDeps } from "../rag/application/ingest-event.handler.js";
 import { retrieveContext, type RetrieveDeps } from "../rag/application/retrieve-context.handler.js";
 import { bearerToken, type TokenPlatformResolver } from "./auth.js";

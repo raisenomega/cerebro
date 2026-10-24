@@ -3,7 +3,7 @@
  * Voyage) y dev local. Replican el aislamiento por owner y la idempotencia.
  */
 import { randomUUID } from "node:crypto";
-import type { Visibility } from "@raisen/cerebro-contracts";
+import type { Visibility } from "@raisenomega/cerebro-contracts";
 import type { OwnerId } from "../../identity/domain/person.types.js";
 import type { EmbeddingProvider } from "../domain/embedding.port.js";
 import type {

@@ -2,7 +2,7 @@
  * Errores tipados del dominio de identidad. Discriminados por `kind` para que
  * el borde (API/ingester) los mapee a HTTP/log sin `catch` sin tipo.
  */
-import type { IdType } from "@raisen/cerebro-contracts";
+import type { IdType } from "@raisenomega/cerebro-contracts";
 
 export type NormalizeError =
   | { readonly kind: "empty_value"; readonly id_type: IdType }

@@ -5,7 +5,7 @@
  * de modo que cualquier resolución futura cae en el superviviente.
  * Nunca lanza: Result<PersonId, MergeError>.
  */
-import type { PersonId } from "@raisen/cerebro-contracts";
+import type { PersonId } from "@raisenomega/cerebro-contracts";
 import { type Result, ok, err } from "../../shared/result.js";
 import type { MergeError } from "../domain/identity.errors.js";
 import type { OwnerId } from "../domain/person.types.js";

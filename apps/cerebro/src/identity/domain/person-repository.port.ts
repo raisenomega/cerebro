@@ -11,7 +11,7 @@
  *   - IdentityStore: operaciones de identidad dentro de ese contexto. El
  *     `ownerId` explícito en cada op es defensa en profundidad sobre la RLS.
  */
-import type { IdType, PersonId } from "@raisen/cerebro-contracts";
+import type { IdType, PersonId } from "@raisenomega/cerebro-contracts";
 import type { OwnerId, PersonIdentityRecord, PersonRecord } from "./person.types.js";
 
 /** Búsqueda de identidad ya normalizada, dentro de un owner. */

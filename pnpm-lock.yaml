@@ -17,7 +17,7 @@ importers:
 
   apps/cerebro:
     dependencies:
-      '@raisen/cerebro-contracts':
+      '@raisenomega/cerebro-contracts':
         specifier: workspace:*
         version: link:../../packages/cerebro-contracts
       pg:
