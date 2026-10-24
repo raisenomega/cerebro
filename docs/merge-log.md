@@ -1,0 +1,1 @@
+- 2026-10-23T21:51:41+00:00 · 65fb353 · raisenomega · fix(husky): pre-push POSIX sh (dash compat)
