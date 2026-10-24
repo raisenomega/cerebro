@@ -45,7 +45,10 @@ export {
 // ── Slice 2: RAG (ingesta + retrieve con scope) ──────────────────────────
 export { ingestEvent, type IngestDeps } from "./rag/application/ingest-event.handler.js";
 export { retrieveContext, type RetrieveDeps } from "./rag/application/retrieve-context.handler.js";
-export { agentVisibilityScope } from "./rag/domain/scope.js";
+export type { ScopeStore } from "./rag/domain/scope-store.port.js";
+export { PgScopeStore } from "./rag/infrastructure/pg-scope-store.js";
+export { InMemoryScopeStore, SCOPE_SEED } from "./rag/infrastructure/in-memory-scope.js";
+export { buildNucleoSeedEvents, type NucleoSeedCustomer } from "./seed/nucleo-seed.js";
 export { computeDedupKey } from "./rag/domain/dedup.js";
 export type { EmbeddingProvider } from "./rag/domain/embedding.port.js";
 export type {

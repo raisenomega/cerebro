@@ -11,15 +11,17 @@ import {
   InMemoryKnowledgeUnitOfWork,
   FakeEmbedder,
 } from "../infrastructure/in-memory-knowledge.js";
+import { InMemoryScopeStore } from "../infrastructure/in-memory-scope.js";
 
 function makeShared() {
   const ownerResolver = new InMemoryOwnerResolver().register("hub", "t1", "owner-1");
   const identityUow = new InMemoryIdentityUnitOfWork();
   const knowledgeUow = new InMemoryKnowledgeUnitOfWork(new InMemoryKnowledgeStore());
   const embedder = new FakeEmbedder(32);
+  const scopeStore = new InMemoryScopeStore();
   return {
     ingestDeps: { ownerResolver, uow: identityUow, knowledgeUow, embedder },
-    retrieveDeps: { ownerResolver, identityUow, knowledgeUow, embedder } satisfies RetrieveDeps,
+    retrieveDeps: { ownerResolver, identityUow, knowledgeUow, embedder, scopeStore } satisfies RetrieveDeps,
   };
 }
 
@@ -52,14 +54,14 @@ describe("retrieveContext", () => {
     expect(res.chunks.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("el scope del agente filtra lo financial (default no lo incluye)", async () => {
+  it("el scope del agente filtra lo financial (eco no ve payment.received)", async () => {
     const { ingestDeps, retrieveDeps } = makeShared();
-    await ingestEvent(ingestDeps, ev()); // internal
-    await ingestEvent(ingestDeps, ev({ event: "order.created", payload: { total: 150 } })); // financial
-    const res = await retrieveContext(retrieveDeps, rq());
+    await ingestEvent(ingestDeps, ev()); // message.received -> internal
+    await ingestEvent(ingestDeps, ev({ event: "payment.received", payload: { amount: 150 } })); // financial
+    const res = await retrieveContext(retrieveDeps, rq({ requesting_agent: "eco" }));
     expect(res.degraded).toBe(false);
-    expect(res.chunks.some((c) => c.kind === "message.received")).toBe(true);
-    expect(res.chunks.every((c) => c.kind !== "order.created")).toBe(true);
+    expect(res.chunks.some((c) => c.kind === "message.received")).toBe(true); // internal, eco sí
+    expect(res.chunks.every((c) => c.kind !== "payment.received")).toBe(true); // financial, eco no
   });
 
   it("tenant desconocido -> degradado y vacío", async () => {

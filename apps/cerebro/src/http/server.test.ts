@@ -12,6 +12,7 @@ import {
   InMemoryKnowledgeUnitOfWork,
   FakeEmbedder,
 } from "../rag/infrastructure/in-memory-knowledge.js";
+import { InMemoryScopeStore } from "../rag/infrastructure/in-memory-scope.js";
 
 let server: Server;
 let base: string;
@@ -38,10 +39,11 @@ beforeAll(async () => {
   const identityUow = new InMemoryIdentityUnitOfWork();
   const knowledgeUow = new InMemoryKnowledgeUnitOfWork(new InMemoryKnowledgeStore());
   const embedder = new FakeEmbedder(32);
+  const scopeStore = new InMemoryScopeStore();
   server = createCerebroServer({
     authResolver: (t) => (t === "tok-hub" ? "hub" : null),
     ingestDeps: { ownerResolver, uow: identityUow, knowledgeUow, embedder },
-    retrieveDeps: { ownerResolver, identityUow, knowledgeUow, embedder },
+    retrieveDeps: { ownerResolver, identityUow, knowledgeUow, embedder, scopeStore },
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const addr = server.address() as AddressInfo;

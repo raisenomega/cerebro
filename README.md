@@ -61,3 +61,12 @@ API de CEREBRO para que las plataformas alimenten y consulten la memoria:
 ```bash
 pnpm --filter @raisen/cerebro start   # levanta la API (requiere DATABASE_URL, VOYAGE_API_KEY, CEREBRO_SERVICE_TOKEN_*)
 ```
+
+## Slice 3 — El loop + scope por agente (en PR)
+
+El "ajá": una plataforma consulta y ve el historial que otra alimentó, del mismo negocio (owner), con **least-privilege por agente**.
+- Migración `003` (`agent_scope`): qué visibilidades ve cada agente; **fail-closed** (agente desconocido → vacío, honest-None). Retrieve lee el scope de esta tabla.
+- Seed de NÚCLEO con las formas reales (`customer_profiles`, `tenant_landing_orders`, `invoice_payments⋈invoices`); historial de órdenes = `internal` (visible), pagos = `financial`.
+- E2E (en memoria): `retrieve(victor)` ve órdenes+pagos · `retrieve(eco)` sin financial · `retrieve(desconocido)` vacío.
+
+v1 = SOLO el loop (sin grafo ni `agent_memory`/`was_correct` — fase posterior).
