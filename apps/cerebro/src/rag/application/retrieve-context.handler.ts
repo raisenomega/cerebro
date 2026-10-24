@@ -15,14 +15,15 @@ import type {
 import { normalizeIdentity } from "../../identity/domain/normalize.js";
 import type { EmbeddingProvider } from "../domain/embedding.port.js";
 import type { KnowledgeUnitOfWork } from "../domain/knowledge-store.port.js";
+import type { ScopeStore } from "../domain/scope-store.port.js";
 import type { ScoredChunk } from "../domain/knowledge.types.js";
-import { agentVisibilityScope } from "../domain/scope.js";
 
 export interface RetrieveDeps {
   readonly ownerResolver: OwnerResolver;
   readonly identityUow: IdentityUnitOfWork;
   readonly knowledgeUow: KnowledgeUnitOfWork;
   readonly embedder: EmbeddingProvider;
+  readonly scopeStore: ScopeStore;
 }
 
 const DEFAULT_MAX_CHUNKS = 6;
@@ -52,12 +53,16 @@ export async function retrieveContext(
     });
     if (personId === null) return emptyOk(null, []);
 
+    // Scope del agente desde agent_scope (§3). Fail-closed: desconocido / sin
+    // filas -> [] -> no se busca nada ni se gasta un embed (honest-None).
+    const visibilities = await deps.scopeStore.visibilitiesFor(req.requesting_agent);
+    if (visibilities.length === 0) return emptyOk(personId, []);
+
     const vectors = await deps.embedder.embed([req.query]);
     const queryEmbedding = vectors[0];
     if (queryEmbedding === undefined) return degraded();
 
     const limit = req.max_chunks ?? DEFAULT_MAX_CHUNKS;
-    const visibilities = agentVisibilityScope(req.requesting_agent);
     const chunks = await deps.knowledgeUow.withOwner(ownerId, (store) =>
       store.searchSimilar(ownerId, personId, queryEmbedding, visibilities, limit),
     );

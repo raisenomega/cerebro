@@ -10,10 +10,11 @@ export function buildContent(event: CerebroEvent): string {
 
 export function visibilityForEvent(event: CerebroEvent): Visibility {
   switch (event.event) {
-    case "order.created":
     case "payment.received":
-      return "financial";
+      return "financial"; // dinero -> financial (solo zahra/kelsy/victor)
     default:
+      // order.created, message.received, contact.updated, customer.created… ->
+      // internal: el historial de órdenes es visible por defecto (el "ajá").
       return "internal";
   }
 }
