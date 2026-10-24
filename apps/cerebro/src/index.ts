@@ -42,5 +42,29 @@ export {
   InMemoryIdentityUnitOfWork,
 } from "./identity/infrastructure/in-memory-identity.js";
 
+// ── Slice 2: RAG (ingesta + retrieve con scope) ──────────────────────────
+export { ingestEvent, type IngestDeps } from "./rag/application/ingest-event.handler.js";
+export { retrieveContext, type RetrieveDeps } from "./rag/application/retrieve-context.handler.js";
+export { agentVisibilityScope } from "./rag/domain/scope.js";
+export { computeDedupKey } from "./rag/domain/dedup.js";
+export type { EmbeddingProvider } from "./rag/domain/embedding.port.js";
+export type {
+  KnowledgeStore,
+  KnowledgeUnitOfWork,
+} from "./rag/domain/knowledge-store.port.js";
+export type { NewChunk, ScoredChunk, StoredChunkRef } from "./rag/domain/knowledge.types.js";
+export type { IngestError } from "./rag/domain/errors.js";
+export { VoyageEmbeddingProvider } from "./rag/infrastructure/voyage.adapter.js";
+export { PgKnowledgeUnitOfWork } from "./rag/infrastructure/pg-knowledge-store.js";
+export {
+  InMemoryKnowledgeStore,
+  InMemoryKnowledgeUnitOfWork,
+  FakeEmbedder,
+} from "./rag/infrastructure/in-memory-knowledge.js";
+
+// HTTP
+export { createCerebroServer, type ServerDeps } from "./http/server.js";
+export { envTokenResolver, bearerToken, type TokenPlatformResolver } from "./http/auth.js";
+
 // Shared
 export { type Result, ok, err, isOk, isErr } from "./shared/result.js";
