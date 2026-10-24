@@ -32,12 +32,16 @@ export function createCerebroServer(deps: ServerDeps): Server {
 }
 
 async function handle(deps: ServerDeps, req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const url = (req.url ?? "").split("?")[0];
+
+  // Health check SIN auth (para el health check de Railway).
+  if (req.method === "GET" && url === "/health") return sendJson(res, 200, { status: "ok" });
+
   if (req.method !== "POST") return sendJson(res, 405, { error: "method_not_allowed" });
 
   const platform = deps.authResolver(bearerToken(req.headers.authorization) ?? "");
   if (platform === null) return sendJson(res, 401, { error: "unauthorized" });
 
-  const url = (req.url ?? "").split("?")[0];
   if (url === "/cerebro/ingest") return ingestRoute(deps, platform, req, res);
   if (url === "/cerebro/retrieve") return retrieveRoute(deps, platform, req, res);
   return sendJson(res, 404, { error: "not_found" });

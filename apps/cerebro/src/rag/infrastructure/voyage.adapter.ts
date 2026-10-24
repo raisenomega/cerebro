@@ -6,20 +6,26 @@
 import type { EmbeddingProvider } from "../domain/embedding.port.js";
 
 const VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";
-const DIMENSION = 1024;
+const DEFAULT_DIMENSION = 1024; // FIJO en el ecosistema; vector(1024) en la DB.
 
 interface VoyageResponse {
   readonly data: ReadonlyArray<{ readonly embedding: number[] }>;
 }
 
 export class VoyageEmbeddingProvider implements EmbeddingProvider {
-  readonly dimension = DIMENSION;
+  readonly dimension: number;
   private readonly apiKey: string;
   private readonly model: string;
 
-  constructor(apiKey: string = requireEnv("VOYAGE_API_KEY"), model: string = process.env.VOYAGE_MODEL ?? "voyage-3-large") {
+  constructor(
+    apiKey: string = requireEnv("VOYAGE_API_KEY"),
+    model: string = process.env.VOYAGE_MODEL ?? "voyage-3-large",
+    dimension: number = Number(process.env.VOYAGE_DIM ?? String(DEFAULT_DIMENSION)),
+  ) {
     this.apiKey = apiKey;
     this.model = model;
+    // Debe coincidir con vector(1024) de la migración 002; cambiarla exige re-embeber todo.
+    this.dimension = dimension;
   }
 
   async embed(texts: readonly string[]): Promise<number[][]> {
@@ -32,7 +38,7 @@ export class VoyageEmbeddingProvider implements EmbeddingProvider {
       body: JSON.stringify({
         input: texts,
         model: this.model,
-        output_dimension: DIMENSION,
+        output_dimension: this.dimension,
       }),
     });
     if (!res.ok) {

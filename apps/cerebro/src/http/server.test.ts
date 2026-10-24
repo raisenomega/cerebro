@@ -86,4 +86,11 @@ describe("API HTTP de CEREBRO", () => {
     const r = await post("/cerebro/ingest", { ...EVENT, source_platform: "nucleo" }, "tok-hub");
     expect(r.status).toBe(403);
   });
+
+  it("GET /health -> 200 sin auth (health check de Railway)", async () => {
+    const r = await fetch(`${base}/health`);
+    expect(r.status).toBe(200);
+    const body = (await r.json()) as { status: string };
+    expect(body.status).toBe("ok");
+  });
 });

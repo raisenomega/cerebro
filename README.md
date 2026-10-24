@@ -70,3 +70,15 @@ El "ajá": una plataforma consulta y ve el historial que otra alimentó, del mis
 - E2E (en memoria): `retrieve(victor)` ve órdenes+pagos · `retrieve(eco)` sin financial · `retrieve(desconocido)` vacío.
 
 v1 = SOLO el loop (sin grafo ni `agent_memory`/`was_correct` — fase posterior).
+
+## Deploy (Railway)
+
+La API se despliega en Railway leyendo TODO de variables de entorno (ver `.env.example`):
+`DATABASE_URL` (pooler de Supabase, rol miembro de `cerebro_api` sin BYPASSRLS), `VOYAGE_API_KEY`, `VOYAGE_MODEL`, `VOYAGE_DIM`, `CEREBRO_SERVICE_TOKEN_*`, `PORT`.
+
+- Build: `pnpm install --frozen-lockfile && pnpm -r build`
+- Arranque: `pnpm start` (→ `pnpm --filter @raisen/cerebro start` → `node dist/http/main.js`)
+- Health check (sin auth): `GET /health` → `200 {"status":"ok"}`
+- Config: `railway.json` (Nixpacks + healthcheck en `/health`).
+
+Ningún secreto vive en el repo: las llaves van al Vault de Railway.
