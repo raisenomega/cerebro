@@ -63,7 +63,9 @@ async function ingestRoute(
   const result = await ingestEvent(deps.ingestDeps, body);
   if (result.ok) return sendJson(res, 202, result.value); // Accepted
   const status = ingestErrorStatus(result.error.kind);
-  return sendJson(res, status, { error: result.error.kind });
+  const detail = "detail" in result.error ? (result.error as { detail?: string }).detail : undefined;
+  if (detail !== undefined) console.error(`[ingest-error] ${result.error.kind}: ${detail}`); // DIAG temporal: ver la causa raiz
+  return sendJson(res, status, { error: result.error.kind, detail });
 }
 
 async function retrieveRoute(
