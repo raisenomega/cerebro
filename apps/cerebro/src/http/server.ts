@@ -64,8 +64,8 @@ async function ingestRoute(
   if (result.ok) return sendJson(res, 202, result.value); // Accepted
   const status = ingestErrorStatus(result.error.kind);
   const detail = "detail" in result.error ? (result.error as { detail?: string }).detail : undefined;
-  if (detail !== undefined) console.error(`[ingest-error] ${result.error.kind}: ${detail}`); // DIAG temporal: ver la causa raiz
-  return sendJson(res, status, { error: result.error.kind, detail });
+  if (detail !== undefined) console.error(`[ingest-error] ${result.error.kind}: ${detail}`); // observabilidad en logs (no se expone al cliente)
+  return sendJson(res, status, { error: result.error.kind });
 }
 
 async function retrieveRoute(
